@@ -26,6 +26,11 @@ package org.voltdb.catalog;
  */
 public class Site extends CatalogType {
 
+    /**
+     * Replication:
+     * Every site has a replica set Id which groups sites together to form a replica set
+     */
+    private int replicaSiteId;
     int m_id;
     CatalogMap<Partition> m_partitions;
     boolean m_isUp;
@@ -41,6 +46,7 @@ public class Site extends CatalogType {
         this.addField("isUp", m_isUp);
         this.addField("messenger_port", m_messenger_port);
         this.addField("proc_port", m_proc_port);
+        this.addField("replicaSiteId", replicaSiteId);
     }
 
     public void update() {
@@ -48,13 +54,19 @@ public class Site extends CatalogType {
         m_isUp = (Boolean) m_fields.get("isUp");
         m_messenger_port = (Integer) m_fields.get("messenger_port");
         m_proc_port = (Integer) m_fields.get("proc_port");
+        replicaSiteId=(Integer) m_fields.get("replicaSiteId");//Every site with this id belongs to the same replica set
     }
 
+    /** GETTER: replicaSiteId */
+    public int getReplicaSiteId() {
+        return replicaSiteId;
+    }
+    
     /** GETTER: Site Id */
     public int getId() {
         return m_id;
     }
-
+    
     /** GETTER: Which host does the site belong to? */
     public Host getHost() {
         Object o = getField("host");
@@ -88,6 +100,11 @@ public class Site extends CatalogType {
         return m_proc_port;
     }
 
+    /** SETTER: Site Id */
+    public void setReplicaSiteId(int value) {
+        replicaSiteId = value; m_fields.put("replicaSiteId", value);
+    }
+    
     /** SETTER: Site Id */
     public void setId(int value) {
         m_id = value; m_fields.put("id", value);

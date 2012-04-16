@@ -21,7 +21,9 @@
 
 package org.voltdb.catalog;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -58,6 +60,27 @@ public abstract class CatalogType implements Comparable<CatalogType> {
     private transient Class<? extends CatalogType> m_class = null;
     
     /**
+     * Since every concrete/subclass class of CatalogType is local,
+     * we need a static collection to deal with replication set ids 
+     * replicaSetId, [site_id,site_id,...]
+     */
+     private static HashMap<Integer,LinkedList<Integer>> replicaSet; 
+     static
+     {
+         replicaSet=new HashMap<Integer,LinkedList<Integer>>();      
+     }
+    
+     /**
+      * 
+      * @param setId
+      * @return site id of the sites that are in the same replica set
+      */
+     
+     public static LinkedList<Integer> getReplicaSet(Integer setId)
+     {
+         return replicaSet.get(setId);
+     }
+    /**
      * Add a field and update the count for the number of fields
      * @param key
      * @param val
@@ -65,6 +88,27 @@ public abstract class CatalogType implements Comparable<CatalogType> {
     protected synchronized final void addField(String key, Object val) {
         this.m_fields.put(key, val);
         this.m_num_fields++;
+        /*
+         * persist local replica site information globally 
+         */
+        if(key.equalsIgnoreCase("replicaSiteId"))
+            if(val instanceof Integer)
+            {
+                int repSiteId=(Integer)val;
+                int sId= (Integer)this.getField("site_id");
+                LinkedList<Integer> siteIds;
+                if(replicaSet.get(repSiteId) ==null)
+                {   siteIds= new LinkedList<Integer>();
+                    siteIds.add(sId);
+                    replicaSet.put(repSiteId, siteIds);
+                }
+                else
+                { replicaSet.get(repSiteId).add(sId);}
+            }
+                
+            
+
+         
     }
     
     /**

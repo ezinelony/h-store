@@ -190,6 +190,11 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     private final Database catalog_db;
     private final PartitionEstimator p_estimator;
     private final AbstractHasher hasher;
+    /**
+     * Replication:
+     * Every site has a replica set Id which groups sites together to form a replica set
+     */
+    private final int replicaSiteId;
     
     /** All of the partitions in the cluster */
     private final Collection<Integer> all_partitions;
@@ -274,6 +279,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
      */
     private final AbstractEstimator fixed_estimator;
     
+
     // ----------------------------------------------------------------------------
     // STATUS + PROFILING MEMBERS
     // ----------------------------------------------------------------------------
@@ -317,6 +323,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         this.catalog_db = CatalogUtil.getDatabase(this.catalog_site);
         this.site_id = this.catalog_site.getId();
         this.site_name = HStoreThreadManager.getThreadName(this.site_id, null);
+        this.replicaSiteId=this.catalog_site.getReplicaSiteId();
         
         this.all_partitions = CatalogUtil.getAllPartitionIds(this.catalog_db);
         final int num_partitions = this.all_partitions.size();
@@ -572,6 +579,12 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         return (this.site_name);
     }
     
+    /**
+     * Return replicaSite Id: ever site with same id belongs to the same replica set 
+     */
+    public int getReplicaSiteId() {
+        return (this.replicaSiteId);
+    }
     /**
      * Return the list of all the partition ids in this H-Store database cluster
      */
