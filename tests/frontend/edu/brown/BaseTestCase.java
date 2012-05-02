@@ -429,13 +429,13 @@ public abstract class BaseTestCase extends TestCase implements UncaughtException
         assertEquals(num_partitions, CatalogUtil.getNumberOfPartitions(cluster));
     }
     
-    protected void initializeCluster(int num_hosts, int num_sites, int num_partitions) throws Exception {
+    protected void initializeCluster(int num_hosts, int num_sites, int num_partitions,int replication_factor) throws Exception {
         // HACK! If we already have this many partitions in the catalog, then we won't recreate it
         // This fixes problems where we need to reference the same catalog objects in multiple test cases
         if (CatalogUtil.getNumberOfHosts(catalog_db) != num_hosts ||
             CatalogUtil.getNumberOfSites(catalog_db) != (num_hosts * num_sites) ||
             CatalogUtil.getNumberOfPartitions(catalog_db) != (num_hosts * num_sites * num_partitions)) {
-            catalog = FixCatalog.addHostInfo(catalog, "localhost", num_hosts, num_sites, num_partitions);
+            catalog = FixCatalog.addHostInfo(catalog, "localhost", num_hosts, num_sites, num_partitions,replication_factor);
             this.init(this.last_type, catalog);
         }
         Cluster cluster = CatalogUtil.getCluster(catalog_db);

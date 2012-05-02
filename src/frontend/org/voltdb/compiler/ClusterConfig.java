@@ -19,6 +19,10 @@ package org.voltdb.compiler;
 public class ClusterConfig
 {
     
+    public ClusterConfig(int replicationFactor) {
+        m_replicationFactor = replicationFactor;
+    }
+    
     public ClusterConfig() {
         // Nothing...
     }

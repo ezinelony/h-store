@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/frontend"/>
+	<classpathentry exported="true" kind="lib" path="/Users/nelly/git/h-store/third_party/java/jars/zookeeper-3.3.5.jar"/>
 	<classpathentry kind="src" path="src/hsqldb19b3"/>
 	<classpathentry kind="src" path="src/protorpc"/>
 	<classpathentry kind="src" path="tests/frontend"/>

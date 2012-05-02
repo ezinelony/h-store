@@ -28,11 +28,15 @@ public class TestHStoreCoordinator extends BaseTestCase {
 
     private final int NUM_HOSTS               = 1;
     private final int NUM_SITES_PER_HOST      = 4;
+    //Nelson
+    private final int REPLICATION_FACTOR      = 1;//For every site, there is one replica on the same or different host
+    //nelson
+    private final int TOTAL_SITES_PER_HOST=NUM_SITES_PER_HOST+(REPLICATION_FACTOR*NUM_SITES_PER_HOST);
     private final int NUM_PARTITIONS_PER_SITE = 2;
-    private final int NUM_SITES               = (NUM_HOSTS * NUM_SITES_PER_HOST);
+    private final int NUM_SITES               = (NUM_HOSTS * TOTAL_SITES_PER_HOST);
     
-    private final HStoreSite hstore_sites[] = new HStoreSite[NUM_SITES_PER_HOST];
-    private final HStoreCoordinator coordinators[] = new HStoreCoordinator[NUM_SITES_PER_HOST];
+    private final HStoreSite hstore_sites[] = new HStoreSite[TOTAL_SITES_PER_HOST];
+    private final HStoreCoordinator coordinators[] = new HStoreCoordinator[TOTAL_SITES_PER_HOST];
     
     private final VoltTable.ColumnInfo columns[] = {
         new VoltTable.ColumnInfo("key", VoltType.STRING),
@@ -48,8 +52,8 @@ public class TestHStoreCoordinator extends BaseTestCase {
         
         // Create a fake cluster of two HStoreSites, each with two partitions
         // This will allow us to test same site communication as well as cross-site communication
-        this.initializeCluster(NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE);
-        for (int i = 0; i < NUM_SITES; i++) {
+        this.initializeCluster(NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE,REPLICATION_FACTOR);
+        for (int i = 0; i < NUM_SITES_PER_HOST; i++) {
             Site catalog_site = this.getSite(i);
             this.hstore_sites[i] = new MockHStoreSite(catalog_site, HStoreConf.singleton());
             this.coordinators[i] = this.hstore_sites[i].initHStoreCoordinator();
@@ -184,7 +188,7 @@ public class TestHStoreCoordinator extends BaseTestCase {
         //      Note that I don't know what happens to the other messengers when you kill one of them
         //      so you test whether they are alive or not. It's not a big deal either way, since 
         //      HStore isn't a production database, but it would be nice to know.
-        for (int i = 0; i < NUM_SITES_PER_HOST; i++) {
+        for (int i = 0; i < TOTAL_SITES_PER_HOST; i++) {
             HStoreCoordinator m = this.coordinators[i];
             // stop messenger
             m.shutdown();

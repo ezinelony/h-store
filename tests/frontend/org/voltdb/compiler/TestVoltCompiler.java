@@ -51,6 +51,8 @@ public class TestVoltCompiler extends BaseTestCase {
     String nothing_jar;
     String testout_jar;
 
+    //Two hosts, two sites per host, one is a replica
+   // final ClusterConfig cluster_config = new ClusterConfig(2, 2, 0, "localhost");
     final ClusterConfig cluster_config = new ClusterConfig(1, 1, 0, "localhost");
     
     @Override

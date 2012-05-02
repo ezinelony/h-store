@@ -63,6 +63,10 @@ public class ClusterConfiguration extends ClusterConfig {
         }
     }
 
+    public ClusterConfiguration(int replicationFactor) {
+        super(replicationFactor);
+    }
+    
     public ClusterConfiguration() {
         super();
     }

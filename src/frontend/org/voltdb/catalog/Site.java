@@ -21,6 +21,8 @@
 
 package org.voltdb.catalog;
 
+import java.util.LinkedList;
+
 /**
  * A physical execution context for the system
  */
@@ -30,13 +32,24 @@ public class Site extends CatalogType {
      * Replication:
      * Every site has a replica set Id which groups sites together to form a replica set
      */
-    private int replicaSiteId;
+    int replicaSiteId;
     int m_id;
     CatalogMap<Partition> m_partitions;
     boolean m_isUp;
     int m_messenger_port;
     int m_proc_port;
+    boolean m_isPrimary=false;
+    private LinkedList<Integer> replicaSet;
 
+    public void setAsPrimary()
+    {
+        m_isPrimary=true;
+    }
+    
+    public boolean isPrimary()
+    {
+        return m_isPrimary;
+    }
     void setBaseValues(Catalog catalog, CatalogType parent, String path, String name) {
         super.setBaseValues(catalog, parent, path, name);
         this.addField("id", m_id);
@@ -47,6 +60,7 @@ public class Site extends CatalogType {
         this.addField("messenger_port", m_messenger_port);
         this.addField("proc_port", m_proc_port);
         this.addField("replicaSiteId", replicaSiteId);
+        replicaSet= new LinkedList<Integer>();
     }
 
     public void update() {
@@ -102,7 +116,8 @@ public class Site extends CatalogType {
 
     /** SETTER: Site Id */
     public void setReplicaSiteId(int value) {
-        replicaSiteId = value; m_fields.put("replicaSiteId", value);
+        replicaSiteId = value;
+        m_fields.put("replicaSiteId", value);
     }
     
     /** SETTER: Site Id */

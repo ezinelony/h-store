@@ -39,10 +39,14 @@ public class TestMapReduceTransaction extends BaseTestCase{
     
     private final int NUM_HOSTS               = 1;
     private final int NUM_SITES_PER_HOST      = 4;
+    //Nelson
+    private final int REPLICATION_FACTOR      = 1;//For every site, there is one replica on the same or different host
+    //nelson
+    private final int TOTAL_SITES_PER_HOST=NUM_SITES_PER_HOST+(REPLICATION_FACTOR*NUM_SITES_PER_HOST);
     private final int NUM_PARTITIONS_PER_SITE = 2;
-    private final int NUM_SITES               = (NUM_HOSTS * NUM_SITES_PER_HOST);
+    private final int NUM_SITES               = (NUM_HOSTS * TOTAL_SITES_PER_HOST);
     
-    private final HStoreSite sites[] = new HStoreSite[NUM_SITES_PER_HOST];
+    private final HStoreSite sites[] = new HStoreSite[TOTAL_SITES_PER_HOST];
 //    private final HStoreCoordinator messengers[] = new HStoreCoordinator[NUM_SITES_PER_HOST];
     
     @Override
@@ -51,7 +55,7 @@ public class TestMapReduceTransaction extends BaseTestCase{
         
         // Create a fake cluster of two HStoreSites, each with two partitions
         // This will allow us to test same site communication as well as cross-site communication
-        this.initializeCluster(NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE);
+        this.initializeCluster(NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE,REPLICATION_FACTOR);
         for (int i = 0; i < NUM_SITES; i++) {
             Site catalog_site = this.getSite(i);
             this.sites[i] = new MockHStoreSite(catalog_site, HStoreConf.singleton());

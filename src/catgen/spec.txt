@@ -50,6 +50,8 @@ begin Site             "A physical execution context for the system"
    bool isUp            "Is the site up?"
    int messenger_port   "Port used by HStoreCoordinator"
    int proc_port        "Port used by VoltProcedureListener"
+   int replicaSiteId    "replicaSiteId"
+   int* replicaSet		"The site ids of all the sites in this site's replica set"
 end
 
 begin Database          "A set of schema, procedures and other metadata that together comprise an application"

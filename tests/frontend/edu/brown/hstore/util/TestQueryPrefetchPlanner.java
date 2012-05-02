@@ -35,11 +35,15 @@ public class TestQueryPrefetchPlanner extends BaseTestCase {
     private static final int NUM_HOSTS = 1;
     private static final int NUM_SITES = 4; // per host
     private static final int NUM_PARTITIONS = 1; // per site
+    //Nelson
+    private final int REPLICATION_FACTOR      = 1;//For every site, there is one replica on the same or different host
+    //nelson
+    private final int TOTAL_SITES_PER_HOST=NUM_SITES+(REPLICATION_FACTOR*NUM_SITES);
     private static final int LOCAL_SITE = 0;
     private static final int LOCAL_PARTITION = 0;
 
-    private final MockHStoreSite[] hstore_sites = new MockHStoreSite[NUM_SITES];
-    private final HStoreCoordinator[] coordinators = new HStoreCoordinator[NUM_SITES];
+    private final MockHStoreSite[] hstore_sites = new MockHStoreSite[TOTAL_SITES_PER_HOST];
+    private final HStoreCoordinator[] coordinators = new HStoreCoordinator[TOTAL_SITES_PER_HOST];
 
     private LocalTransaction ts;
 
@@ -58,7 +62,7 @@ public class TestQueryPrefetchPlanner extends BaseTestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp(ProjectType.SEATS);
-        this.initializeCluster(NUM_HOSTS, NUM_SITES, NUM_PARTITIONS);
+        this.initializeCluster(NUM_HOSTS, NUM_SITES, NUM_PARTITIONS,REPLICATION_FACTOR);
 
         Procedure catalog_proc = this.getProcedure(TARGET_PREFETCH_PROCEDURE);
         Statement catalog_stmt = this.getStatement(catalog_proc, TARGET_PREFETCH_STATEMENT);
@@ -78,7 +82,7 @@ public class TestQueryPrefetchPlanner extends BaseTestCase {
         } // FOR
 
         this.prefetcher = new QueryPrefetchPlanner(catalog_db, p_estimator);
-        for (int i = 0; i < NUM_SITES; i++) {
+        for (int i = 0; i < TOTAL_SITES_PER_HOST; i++) {
             Site catalog_site = this.getSite(i);
             this.hstore_sites[i] = new MockHStoreSite(catalog_site, HStoreConf.singleton());
             this.coordinators[i] = this.hstore_sites[i].initHStoreCoordinator();

@@ -26,6 +26,7 @@
 package edu.brown.hstore;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.channels.CancelledKeyException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.log4j.Logger;
+import org.apache.zookeeper.WatchedEvent;
 import org.voltdb.ClientResponseImpl;
 import org.voltdb.StoredProcedureInvocation;
 import org.voltdb.TransactionIdManager;
@@ -81,6 +83,8 @@ import edu.brown.hstore.estimators.TM1Estimator;
 import edu.brown.hstore.estimators.TPCCEstimator;
 import edu.brown.hstore.interfaces.Loggable;
 import edu.brown.hstore.interfaces.Shutdownable;
+import edu.brown.hstore.replication.Group;
+import edu.brown.hstore.replication.Replicatable;
 import edu.brown.hstore.util.MapReduceHelperThread;
 import edu.brown.hstore.util.PartitionExecutorPostProcessor;
 import edu.brown.hstore.util.TxnCounter;
@@ -111,7 +115,7 @@ import edu.brown.utils.ThreadUtil;
  * 
  * @author pavlo
  */
-public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, Loggable, Runnable {
+public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, Loggable, Runnable,Replicatable {
     public static final Logger LOG = Logger.getLogger(HStoreSite.class);
     private static final LoggerBoolean debug = new LoggerBoolean(LOG.isDebugEnabled());
     private static final LoggerBoolean trace = new LoggerBoolean(LOG.isTraceEnabled());
@@ -192,7 +196,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     private final AbstractHasher hasher;
     /**
      * Replication:
-     * Every site has a replica set Id which groups sites together to form a replica set
+     * Every site with the same  replica set belongs to the same replica set
      */
     private final int replicaSiteId;
     
@@ -305,6 +309,11 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     
     private final String REJECTION_MESSAGE;
     
+    
+    /**
+     * Group
+     */
+    private Group<HStoreSite> group;
     // ----------------------------------------------------------------------------
     // CONSTRUCTOR
     // ----------------------------------------------------------------------------
@@ -324,6 +333,8 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         this.site_id = this.catalog_site.getId();
         this.site_name = HStoreThreadManager.getThreadName(this.site_id, null);
         this.replicaSiteId=this.catalog_site.getReplicaSiteId();
+        //Initialize group:
+        //group= new Group<HStoreSite>(this);
         
         this.all_partitions = CatalogUtil.getAllPartitionIds(this.catalog_db);
         final int num_partitions = this.all_partitions.size();
@@ -580,7 +591,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     }
     
     /**
-     * Return replicaSite Id: ever site with same id belongs to the same replica set 
+     * Return replicaSite Id: every site with same id belongs to the same replica set 
      */
     public int getReplicaSiteId() {
         return (this.replicaSiteId);
@@ -2100,5 +2111,69 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         
         // This will block the MAIN thread!
         ThreadUtil.runNewPool(runnables);
+    }
+
+    //-----------------------------------------------------------
+    // Implementation of replicatable
+    //-----------------------------------------------------------
+
+    @Override
+    public Object execute(Object originator, Object task) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public Object receiveResponse(Object responder, Object result) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public boolean isPrimary() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+
+    @Override
+    public boolean setAsPrimary() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+
+
+    @Override
+    public int getId() { 
+        return this.getSiteId();
+    }
+
+
+
+    @Override
+    public InetAddress getInetAddress() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public void process(WatchedEvent event) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+
+    @Override
+    public int getSetId() {
+        return this.getReplicaSiteId();
     }
 }

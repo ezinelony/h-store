@@ -18,6 +18,7 @@ public class TestFixCatalog extends BaseTestCase {
     private static final int NUM_HOSTS = 10;
     private static final int NUM_SITES_PER_HOST = 2;
     private static final int NUM_PARTITIONS_PER_SITE = 2;
+    private static final int REPLICATION_FACTOR_PER_SITE = 1;
 
     @Override
     protected void setUp() throws Exception {
@@ -28,7 +29,7 @@ public class TestFixCatalog extends BaseTestCase {
      * testAddHostInfo
      */
     public void testAddHostInfo() throws Exception {
-        Catalog new_catalog = FixCatalog.addHostInfo(catalog, NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE);
+        Catalog new_catalog = FixCatalog.addHostInfo(catalog, NUM_HOSTS, NUM_SITES_PER_HOST, NUM_PARTITIONS_PER_SITE,REPLICATION_FACTOR_PER_SITE);
         Cluster catalog_clus = CatalogUtil.getCluster(new_catalog);
         assertEquals(NUM_PARTITIONS_PER_SITE * NUM_SITES_PER_HOST * NUM_HOSTS, CatalogUtil.getNumberOfPartitions(new_catalog));
 
