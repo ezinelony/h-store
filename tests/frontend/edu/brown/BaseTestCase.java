@@ -191,14 +191,15 @@ public abstract class BaseTestCase extends TestCase implements UncaughtException
             }
             if (catalog == null) {
                 switch (type) {
-                    case TPCC:
-                        catalog = TPCCProjectBuilder.getTPCCSchemaCatalog(true);
-                        // Update the ProcParameter mapping used in the catalogs
-//                        ParametersUtil.populateCatalog(CatalogUtil.getDatabase(catalog), ParametersUtil.getParameterMapping(type));
-                        break;
+//                    case TPCC:
+//                        catalog = TPCCProjectBuilder.getTPCCSchemaCatalog(true);
+//                        // Update the ProcParameter mapping used in the catalogs
+////                        ParametersUtil.populateCatalog(CatalogUtil.getDatabase(catalog), ParametersUtil.getParameterMapping(type));
+//                        break;
                     case TPCE:
                         catalog = projectBuilder.createCatalog(fkeys, full_catalog);
                         break;
+                    case TPCC:
                     case TM1:
                     case SEATS:
                     case AUCTIONMARK:
@@ -206,12 +207,14 @@ public abstract class BaseTestCase extends TestCase implements UncaughtException
                     case LOCALITY:
                     case MAPREDUCE:
                         catalog = projectBuilder.getFullCatalog(fkeys);
+                        if (LOG.isDebugEnabled()) 
+                            LOG.debug(type + " Catalog JAR: " + projectBuilder.getJarPath(true).getAbsolutePath());
                         break;
                     default:
                         assert(false) : "Invalid project type - " + type;
                 } // SWITCH
             }
-            if (type == ProjectType.TPCC) ParametersUtil.populateCatalog(CatalogUtil.getDatabase(catalog), ParametersUtil.getParameterMapping(type));
+            //if (type == ProjectType.TPCC) ParametersUtil.populateCatalog(CatalogUtil.getDatabase(catalog), ParametersUtil.getParameterMapping(type));
             this.init(type, catalog);
         }
     }
@@ -429,12 +432,14 @@ public abstract class BaseTestCase extends TestCase implements UncaughtException
         assertEquals(num_partitions, CatalogUtil.getNumberOfPartitions(cluster));
     }
     
+    protected void initializeCluster(int num_hosts, int num_sites, int num_partitions) throws Exception {
+        this.initializeCluster(num_hosts, num_sites, num_partitions,1);
+    }
     protected void initializeCluster(int num_hosts, int num_sites, int num_partitions,int replication_factor) throws Exception {
         // HACK! If we already have this many partitions in the catalog, then we won't recreate it
         // This fixes problems where we need to reference the same catalog objects in multiple test cases
-        if (CatalogUtil.getNumberOfHosts(catalog_db) != num_hosts ||
-            CatalogUtil.getNumberOfSites(catalog_db) != (num_hosts * num_sites) ||
-            CatalogUtil.getNumberOfPartitions(catalog_db) != (num_hosts * num_sites * num_partitions)) {
+        if (CatalogUtil.getNumberOfHosts(catalog_db) != num_hosts || CatalogUtil.getNumberOfSites(catalog_db) != (num_hosts * num_sites) || CatalogUtil.getNumberOfPartitions(catalog_db) != (num_hosts * num_sites * num_partitions))
+        {
             catalog = FixCatalog.addHostInfo(catalog, "localhost", num_hosts, num_sites, num_partitions,replication_factor);
             this.init(this.last_type, catalog);
         }
