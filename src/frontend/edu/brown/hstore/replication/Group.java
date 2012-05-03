@@ -24,7 +24,7 @@ public class Group<E extends Replicatable>{
     private String name;
     private ZooKeeper zookeeper;
     private ZooKeeper leader;
-    private static int port=2181;  
+    private static int port=6000;  
     private String root;
     private String lRoot; //The root for leader
     

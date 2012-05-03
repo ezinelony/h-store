@@ -102,7 +102,7 @@ public abstract class FixCatalog {
                 catalog_site.setHost(catalog_host);
                 catalog_site.setProc_port(proc_port++);
                 catalog_site.setMessenger_port(messenger_port++);
-                if( ++sitesPerHost < cc.getSitesPerHost())
+                if( ++sitesPerHost < cc.getSitesPerHost() && replicationFactor>0)
                     catalog_site.setReplicaSiteId(siteid);//Set replica site id
                 // Add all the partitions
                 for (Integer partition_id : cc.getPartitionIds(host, siteid)) {
@@ -118,29 +118,30 @@ public abstract class FixCatalog {
         } // FOR
         
         //Assign replicas
-        
-        int sites_per_host=cc.getSitesPerHost();
-        Site[] _sites=catalog_clus.getSites().values(); //(String[])cc.getHosts().toArray();
-       // CatalogMap<Host> _hosts=catalog_clus.getHosts();
-        int totalSitesPerHost= sites_per_host+(sites_per_host*replicationFactor);
-        int totalSitesInCluster=_sites.length;
-        for(int c=1; c <= totalSitesInCluster; c++)
+        if(replicationFactor>0)
         {
-             
-            Site thisSite=_sites[c-1];//.get(c-1);//Error
-            thisSite.setReplicaSiteId(thisSite.getId());
-            //SET PRIMARY
-            thisSite.setAsPrimary();
-            for(int a=1; a <= replicationFactor; a++)
+            int sites_per_host=cc.getSitesPerHost();
+            Site[] _sites=catalog_clus.getSites().values(); //(String[])cc.getHosts().toArray();
+           // CatalogMap<Host> _hosts=catalog_clus.getHosts();
+            int totalSitesPerHost= sites_per_host+(sites_per_host*replicationFactor);
+            int totalSitesInCluster=_sites.length;
+            for(int c=1; c <= totalSitesInCluster; c++)
             {
-                int rpl=(c+(totalSitesPerHost*a)+a*sites_per_host)%totalSitesInCluster-1;
-                Site repSite=_sites[rpl];
-                repSite.setReplicaSiteId(thisSite.getId());
+                 
+                Site thisSite=_sites[c-1];//.get(c-1);//Error
+                thisSite.setReplicaSiteId(thisSite.getId());
+                //SET PRIMARY
+                thisSite.setAsPrimary();
+                for(int a=1; a <= replicationFactor; a++)
+                {
+                    int rpl=(c+(totalSitesPerHost*a)+a*sites_per_host)%totalSitesInCluster-1;
+                    Site repSite=_sites[rpl];
+                    repSite.setReplicaSiteId(thisSite.getId());
+                }
+                if(c%sites_per_host==0)
+                    c=c+(sites_per_host*replicationFactor);
             }
-            if(c%sites_per_host==0)
-                c=c+(sites_per_host*replicationFactor);
         }
-        
         catalog_clus.setNum_partitions(partition_ctr);
         LOG.info(String.format("Updated host information in catalog with %d hosts and %d partitions",
                                catalog_clus.getHosts().size(), partition_ctr));
