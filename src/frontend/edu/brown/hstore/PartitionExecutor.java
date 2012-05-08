@@ -48,6 +48,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -108,6 +109,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.RpcCallback;
 
 import edu.brown.catalog.CatalogUtil;
+import edu.brown.hstore.Hstoreservice.HStoreService;
 import edu.brown.hstore.Hstoreservice.Status;
 import edu.brown.hstore.Hstoreservice.TransactionPrefetchResult;
 import edu.brown.hstore.Hstoreservice.TransactionWorkRequest;
@@ -1481,6 +1483,14 @@ public class PartitionExecutor implements Runnable, Shutdownable, Loggable {
         
         ExecutionMode before_mode = ExecutionMode.COMMIT_ALL;
         boolean predict_singlePartition = ts.isPredictSinglePartition();
+        List<Integer> replicaSet=this.hstore_site.getReplicaSet();
+        List<Site> replicaSetSites=new LinkedList<Site>();
+        
+        for(Integer i:replicaSet)
+        {
+            HStoreService hs= this.hstore_coordinator.getChannel(i);
+            //hs.transactionInit(controller, request, done)
+        }
         
         if (t) LOG.trace(String.format("%s - Attempting to begin processing %s on partition %d [taskHash=%d]",
                                        ts, itask.getClass().getSimpleName(), this.partitionId, itask.hashCode()));

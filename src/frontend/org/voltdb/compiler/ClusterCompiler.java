@@ -22,6 +22,7 @@ import org.voltdb.catalog.Host;
 import org.voltdb.catalog.Partition;
 import org.voltdb.catalog.Site;
 
+import edu.brown.catalog.CatalogUtil;
 import edu.brown.catalog.ClusterConfiguration;
 import edu.brown.catalog.FixCatalog;
 
@@ -82,11 +83,11 @@ public class ClusterCompiler
             site.setId(siteId);
             site.setHost(host);
             site.setIsup(true);
-
+            
             Partition part = site.getPartitions().add(String.valueOf(++partitionCounter));
             part.setId(partitionCounter);
 //            System.err.println("[" + partitionCounter + "] " + CatalogUtil.getDisplayName(site) + " => " + CatalogUtil.getDisplayName(part));
-//            System.err.println(CatalogUtil.debug(site));
+            System.err.println(CatalogUtil.debug(site));
         }
     }
 }

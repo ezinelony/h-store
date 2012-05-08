@@ -52,6 +52,10 @@ public class ClusterConfig
         return m_replicationFactor;
     }
 
+    protected void setReplicationFactor(int r)
+    {
+        m_replicationFactor=r;
+    }
     public String getLeaderAddress()
     {
         return m_leaderAddress;

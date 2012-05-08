@@ -27,6 +27,8 @@ import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.jfree.util.Log;
+
 import edu.brown.catalog.CatalogUtil;
 
 /**
@@ -43,7 +45,6 @@ public abstract class CatalogType implements Comparable<CatalogType> {
 
     LinkedHashMap<String, Object> m_fields = new LinkedHashMap<String, Object>();
     LinkedHashMap<String, CatalogMap<? extends CatalogType>> m_childCollections = new LinkedHashMap<String, CatalogMap<? extends CatalogType>>();
-
     String m_path;
     String m_typename;
     CatalogType m_parent;
@@ -204,7 +205,13 @@ public abstract class CatalogType implements Comparable<CatalogType> {
         if ((field == null) || (value == null)) {
             throw new CatalogException("Null value where it shouldn't be.");
         }
-
+        /*
+        if (m_fields.containsKey(field) == false)//HACK to get me going before  I speak with Andy!!
+            {
+            Log.info("FIELD is not in ..");
+            return; }
+        
+        */
         if (m_fields.containsKey(field) == false)
             throw new CatalogException("Unexpected field name '" + field + "' for " + this);
         Object current = m_fields.get(field);

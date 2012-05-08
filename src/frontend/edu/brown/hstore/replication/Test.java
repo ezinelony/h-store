@@ -88,15 +88,15 @@ try {
     }
 
     @Override
-    public boolean isPrimary() {
+    public boolean getIsPrimary() {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean setAsPrimary() {
+    public void setIsPrimary(boolean p) {
         // TODO Auto-generated method stub
-        return false;
+        
     }
 
     @Override

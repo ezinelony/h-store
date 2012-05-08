@@ -125,7 +125,7 @@ import edu.brown.utils.ThreadUtil;
  * 
  * @author pavlo
  */
-public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, Loggable, Runnable,Replicatable {
+public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, Loggable, Runnable {
     public static final Logger LOG = Logger.getLogger(HStoreSite.class);
     private static final LoggerBoolean debug = new LoggerBoolean(LOG.isDebugEnabled());
     private static final LoggerBoolean trace = new LoggerBoolean(LOG.isTraceEnabled());
@@ -216,7 +216,6 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
      * Replication:
      * Every site with the same  replica set belongs to the same replica set
      */
-    private final int replicaSiteId;
     
     /** All of the partitions in the cluster */
     private final Collection<Integer> all_partitions;
@@ -336,10 +335,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     private final String REJECTION_MESSAGE;
     
     
-    /**
-     * Group
-     */
-    private Group<HStoreSite> group;
+
     // ----------------------------------------------------------------------------
     // CONSTRUCTOR
     // ----------------------------------------------------------------------------
@@ -361,9 +357,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         this.host_id = this.catalog_host.getId();
         this.site_id = this.catalog_site.getId();
         this.site_name = HStoreThreadManager.getThreadName(this.site_id, null);
-        this.replicaSiteId=this.catalog_site.getReplicaSiteId();
-        //Initialize group:
-        //group= new Group<HStoreSite>(this);
+
         
         this.all_partitions = CatalogUtil.getAllPartitionIds(this.catalog_db);
         final int num_partitions = this.all_partitions.size();
@@ -656,10 +650,11 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
     }
     
     /**
-     * Return replicaSite Id: every site with same id belongs to the same replica set 
+     * 
+     * @return the ids of the members of the replica set
      */
-    public int getReplicaSiteId() {
-        return (this.replicaSiteId);
+    public List<Integer> getReplicaSet() {
+        return this.catalog_site.getReplicaSet();
     }
     /**
      * Return the list of all the partition ids in this H-Store database cluster
@@ -2302,70 +2297,7 @@ public class HStoreSite implements VoltProcedureListener.Handler, Shutdownable, 
         ThreadUtil.runNewPool(runnables);
     }
 
-    //-----------------------------------------------------------
-    // Implementation of replicatable
-    //-----------------------------------------------------------
-
-    @Override
-    public Object execute(Object originator, Object task) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-    @Override
-    public Object receiveResponse(Object responder, Object result) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-    @Override
-    public boolean isPrimary() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-
-
-    @Override
-    public boolean setAsPrimary() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-
-
-    @Override
-    public int getId() { 
-        return this.getSiteId();
-    }
-
-
-
-    @Override
-    public InetAddress getInetAddress() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-
-    @Override
-    public void process(WatchedEvent event) {
-        // TODO Auto-generated method stub
-        
-    }
-
-
-
-    @Override
-    public int getSetId() {
-        return this.getReplicaSiteId();
-    } 
-
+ 
 
     /**
      * Added for @AdHoc processes, periodically checks for AdHoc queries waiting to be compiled.
