@@ -17,11 +17,11 @@ import org.apache.zookeeper.data.Stat;
  * 
  */
 
-public class Group<E extends Replicatable> implements HeartBeat {
+public class Group<E extends Replicatable>{// implements HeartBeat {
     
     private static final long serialVersionUID = 5196346009800374283L;
     private ZooKeeper gZookeeper;
-    private HeartBeater<Group<E>> gHeartBeat;
+    //private HeartBeater<Group<E>> gHeartBeat;
     /**
      * the port that zookeeper runs on
      */
@@ -181,7 +181,7 @@ public class Group<E extends Replicatable> implements HeartBeat {
         }
         return null;
     }
-    @Override
+   // @Override
     public void sendBeat() {
         try {
             
@@ -198,7 +198,7 @@ public class Group<E extends Replicatable> implements HeartBeat {
         
         
     }
-    @Override
+    //@Override
     public int getInterval() {
         return Math.abs(this.gZookeeper.getSessionTimeout()-1);
     }
