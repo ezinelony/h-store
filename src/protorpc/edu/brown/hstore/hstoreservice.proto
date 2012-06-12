@@ -384,6 +384,36 @@ message TimeSyncResponse {
     // The time when the remote HStoreSite sent out the response
     required int64 t1_s = 4;
 }
+//----------------------------------------
+//	Replication message
+//----------------------------------------
+	//------------------------------------
+	// TransactionReplicationRequest
+	//------------------------------------
+	
+	message TransactionReplicationRequest {
+		//The HStoreSite id sending this transaction to be replicated by its replicas
+		required int32 originator_site_id=1;
+		//The stored procedure to be replicated id
+		required int32 stored_procedure_id=2;
+		//The relative index/or maybe partition id when I clear it with Andy of the partition to touch
+		required int32 relative_partition_id=3;
+		//THe parameters to the stored procedure Maybe use bytestring later
+		repeated string parameters=4;
+	}
+	//------------------------------------
+	// TransactionReplicationResponse
+	//------------------------------------
+	message TransactionReplicationResponse {
+		//The HStoreSite id sending this transaction to be replicated by its replicas
+		required int32 sender_site_id=1;
+		
+		required int32 stored_procedure_id=2;
+		//The relative index/or maybe partition id when I clear it with Andy of the partition to touch
+		required int32 relative_partition_id=3;
+		//The Result
+		repeated string parameters=4;
+	}
 
 // -----------------------------------
 // SERVICE
@@ -402,4 +432,5 @@ service HStoreService {
     rpc Initialize(InitializeRequest) returns (InitializeResponse);
     rpc Shutdown(ShutdownRequest) returns (ShutdownResponse);
     rpc TimeSync(TimeSyncRequest) returns (TimeSyncResponse);
+    rpc TransactionReplication(TransactionReplicationRequest) returns (TransactionReplicationResponse);
 }
